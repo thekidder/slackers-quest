@@ -13,11 +13,11 @@ object Main {
   val apiClient = SlackApiClient(Settings.apiToken)
 
   def main(args: Array[String]) {
-
-
     rtmClient.onMessage { message =>
       val channelId = rtmClient.state.getChannelIdForName(Settings.channel)
-      if(SlackUtil.extractMentionedIds(message.text).contains(rtmClient.state.self.id) && channelId == message.channel) {
+      println(s"user: ${message.user}, message: ${message.text}, channel: ${message.channel}")
+
+      if(SlackUtil.extractMentionedIds(message.text).contains(rtmClient.state.self.id) && channelId.get == message.channel) {
         val senderName = rtmClient.state.getUserById(message.user).map { _.name } getOrElse "no user"
         rtmClient.sendMessage(message.channel, s"hello there, ${senderName}")
       }
