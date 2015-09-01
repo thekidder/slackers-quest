@@ -17,7 +17,7 @@ object Main {
 
     rtmClient.onMessage { message =>
       val channelId = rtmClient.state.getChannelIdForName(Settings.channel)
-      if(SlackUtil.extractMentionedIds(message.text).contains(rtmClient.state.self.id)) {
+      if(SlackUtil.extractMentionedIds(message.text).contains(rtmClient.state.self.id) && channelId == message.channel) {
         val senderName = rtmClient.state.getUserById(message.user).map { _.name } getOrElse "no user"
         rtmClient.sendMessage(message.channel, s"hello there, ${senderName}")
       }
