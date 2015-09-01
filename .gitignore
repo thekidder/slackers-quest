@@ -1,3 +1,8 @@
+# settings contains api token
+src/main/resources/application.conf
+
+.idea/
+
 *.class
 *.log
 
