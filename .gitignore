@@ -1,3 +1,5 @@
+slackers-quest.data
+
 # only contains an env variable named API_TOKEN - secret for obvious reasons
 api_token.sh
 
