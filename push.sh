@@ -8,5 +8,5 @@ ssh kidder@thekidder.com  << EOF
   git pull
   sbt docker:publishLocal
   # run, using the API_TOKEN sourced at the beginning of this script
-  docker run -d -v /slacker-data:/data -e API_TOKEN=$API_TOKEN slackers-quest
+  docker run -u root -d -v /slacker-data:/data -e API_TOKEN=$API_TOKEN slackers-quest
 EOF
