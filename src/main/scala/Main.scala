@@ -37,7 +37,7 @@ object Main {
 
   def load() : GameData = {
     try {
-      JSONPickle(scala.io.Source.fromFile("./" + Settings.saveFile).mkString).unpickle[GameData]
+      JSONPickle(scala.io.Source.fromFile(Settings.saveFile).mkString).unpickle[GameData]
     } catch {
       case ex: FileNotFoundException => {
         println("no world, creating...")
