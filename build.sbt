@@ -17,6 +17,7 @@ lazy val root = (project in file(".")).
   )
 
 maintainer in Docker := "Adam Kidder <thekidder@gmail.com>"
+dockerUpdateLatest in Docker := true
 
 enablePlugins(JavaServerAppPackaging)
 enablePlugins(DockerPlugin)
