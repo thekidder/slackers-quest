@@ -1,4 +1,4 @@
-import java.io.{FileWriter, BufferedWriter, File, FileInputStream}
+import java.io._
 
 import akka.actor.ActorSystem
 import slack.SlackUtil
@@ -6,7 +6,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import slack.api.SlackApiClient
 import slack.rtm.SlackRtmClient
 import scala.pickling.Defaults._, scala.pickling.json._
-import scala.pickling.binary.BinaryPickle
 import scala.pickling.{Unpickler, Pickler}
 
 import scala.util.{Failure, Success}
@@ -19,11 +18,9 @@ object Main {
   val rtmClient = SlackRtmClient(Settings.apiToken)
   val apiClient = SlackApiClient(Settings.apiToken)
 
-  var data = GameData(Set[String]())
+  var data = load
 
   def main(args: Array[String]) {
-    data = load
-
     rtmClient.onMessage { message =>
       val channelId = rtmClient.state.getChannelIdForName(Settings.channel)
       println(s"user: ${message.user}, message: ${message.text}, channel: ${message.channel}")
@@ -39,7 +36,14 @@ object Main {
   }
 
   def load() : GameData = {
-    JSONPickle(scala.io.Source.fromFile("./" + Settings.saveFile).mkString).unpickle[GameData]
+    try {
+      JSONPickle(scala.io.Source.fromFile("./" + Settings.saveFile).mkString).unpickle[GameData]
+    } catch {
+      case ex: FileNotFoundException => {
+        println("no world, creating...")
+        GameData(Set[String]())
+      }
+    }
   }
 
   def save() {
