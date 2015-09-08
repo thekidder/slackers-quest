@@ -70,7 +70,7 @@ object Main {
       case GameCommand.invite => inviteUsers(message)
       case GameCommand.acceptQuest => acceptQuest(message)
       case ex: GameCommand.Command => {
-        println("some other command!")
+        println("unimplemented command!")
         true
       }
     }
@@ -88,7 +88,7 @@ object Main {
     println("Handling DM...")
     val validCommands = state.userState(message.user) match {
       case UserState.Unseen => Seq(GameCommand.acceptQuest)
-      case UserState.Joined => Seq(GameCommand.invite)
+      case UserState.Joined => Seq(GameCommand.invite, GameCommand.inventory)
       case UserState.Invited => Seq(GameCommand.acceptQuest)
       case UserState.Declined => Seq(GameCommand.rejoin)
     }
@@ -96,7 +96,7 @@ object Main {
       println(s"User ${message.user} inputted invalid request ${message.text}!")
       slackState.imForUserId(message.user).map(im => {
         rtmClient.sendMessage(im.id, "Sorry - I didn't get that. Valid commands:")
-        rtmClient.sendMessage(im.id, validCommands.map(c => s"${c.command} - ${c.tooltip}").mkString("\n"))
+        rtmClient.sendMessage(im.id, validCommands.map(c => s"*${c.command}* - ${c.tooltip}").mkString("\n"))
       })
     }
   }
