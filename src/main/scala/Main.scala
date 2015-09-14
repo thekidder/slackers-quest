@@ -65,16 +65,23 @@ object Main {
     true
   }
 
-  def handleCommand(message: Message, command: Command): Boolean = {
+  def leaveQuest(message: Message): Boolean = {
+    println("left quest")
+    true
+  }
+
+  def inventory(message: Message): Boolean = true
+
+  def rejoinQuest(message: Message): Boolean = true
+
+  def handleCommand(message: Message, command: Command): Boolean =
     command match {
       case GameCommand.invite => inviteUsers(message)
       case GameCommand.acceptQuest => acceptQuest(message)
-      case ex: GameCommand.Command => {
-        println("unimplemented command!")
-        true
-      }
+      case GameCommand.leave => leaveQuest(message)
+      case GameCommand.inventory => inventory(message)
+      case GameCommand.rejoin => rejoinQuest(message)
     }
-  }
 
   def runCommand(message: Message, validCommands: Seq[GameCommand.Command]): Boolean = {
     println(validCommands)
