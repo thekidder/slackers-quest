@@ -8,7 +8,6 @@ import slack.rtm.SlackRtmClient
 
 import scala.util.{Failure, Success}
 
-
 object Main {
   implicit val system = ActorSystem("slack")
   val rtmClient = SlackRtmClient(Settings.apiToken)

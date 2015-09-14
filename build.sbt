@@ -12,7 +12,8 @@ lazy val root = (project in file(".")).
   settings(commonSettings: _*).
   settings(
     name := "slackers-quest",
-    libraryDependencies := Seq(scalaSlack, typesafeConfig, pickling)
+    libraryDependencies := Seq(scalaSlack, typesafeConfig, pickling),
+    scalacOptions := Seq("-Xfatal-warnings")
   ).
   enablePlugins(DockerPlugin).
   enablePlugins(JavaServerAppPackaging)
