@@ -21,7 +21,7 @@ object UserState {
 case class User(id: String, var state: UserState.State)
 
 case class GameData (
-  val users: mutable.Map[String, User]
+  users: mutable.Map[String, User]
 )
 
 object GameData {
@@ -35,7 +35,7 @@ object GameData {
 
       println(s"Saved current data to ${Settings.saveFile}")
     } catch {
-      case ex: IOException => println(s"Could not save data! ${ex}")
+      case ex: IOException => println(s"Could not save data! $ex")
     }
   }
 
@@ -46,14 +46,12 @@ object GameData {
       println(s"Loaded ${Settings.saveFile}")
       data
     } catch {
-      case ex: FileNotFoundException => {
+      case ex: FileNotFoundException =>
         println("No save found, creating...")
         newGameData
-      }
-      case ex: PicklingException => {
+      case ex: PicklingException =>
         println("Invalid save! Recreating...")
         newGameData
-      }
     }
   }
 }

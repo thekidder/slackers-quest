@@ -14,14 +14,14 @@ object Main {
   val apiClient = SlackApiClient(Settings.apiToken)
   val slackState = SlackState(rtmClient)
 
-  var state = GameState.load
+  var state = GameState.load()
 
   def inviteUsers(message: Message): Boolean = {
     val imsToInvite = SlackUtil.extractMentionedIds(message.text)
-      .flatMap(slackState.imForUserId(_))
+      .flatMap(slackState.imForUserId)
       .filter(im => state.userState(im.user) == UserState.Unseen)
 
-    if (imsToInvite.length == 0) {
+    if (imsToInvite.isEmpty) {
       rtmClient.sendMessage(message.channel, "No new users to invite.")
     } else {
       val invitedUsers = imsToInvite
@@ -29,7 +29,7 @@ object Main {
         .flatMap(userId => rtmClient.state.users.find(userId == _.id))
         .map(_.name)
         .mkString(", ")
-      rtmClient.sendMessage(message.channel, s"Invited ${invitedUsers} to ${Settings.gameName}!")
+      rtmClient.sendMessage(message.channel, s"Invited $invitedUsers to ${Settings.gameName}!")
     }
 
     val invitingUser = rtmClient.state.users
@@ -38,10 +38,10 @@ object Main {
       .getOrElse("an unknown entity")
 
     imsToInvite
-      .map(im => {
+      .foreach(im => {
         println(s"Inviting user ${im.user} using IM channel ${im.id}")
         rtmClient.sendMessage(im.id, "The blue glow of your computer monitor flickers and wanes. " +
-          s"The pixels flash brightly, and go black. You see a message from ${invitingUser} in the darkness.\n" +
+          s"The pixels flash brightly, and go black. You see a message from $invitingUser in the darkness.\n" +
           "\"Join me for adventure\", it says. ")
 
         rtmClient.sendMessage(im.id, s"Type ${GameCommand.acceptQuest.command} to join the quest.")
@@ -58,7 +58,7 @@ object Main {
       println(s"User ${im.user} has accepted the quest!")
       rtmClient.sendMessage(im.id, s"A shiver runs down your spine. " +
         "This feels like something big - even more important than looking at cat pictures on Reddit. " +
-        s"You feel a sudden urge to join <#${channelId}|${Settings.channel}>. That's where all the action is.")
+        s"You feel a sudden urge to join <#$channelId|${Settings.channel}>. That's where all the action is.")
       state.data.users.getOrElseUpdate(im.user, User(im.user, UserState.Unseen)).state = UserState.Joined
     }
     true
@@ -87,7 +87,7 @@ object Main {
     val result = validCommands
       .filter(command => message.text.startsWith(command.command))
       .map(command => handleCommand(message, command))
-    !result.contains(false) && result.size > 0
+    !result.contains(false) && result.nonEmpty
   }
 
   def handleDM(message: Message): Unit = {
@@ -100,7 +100,7 @@ object Main {
     }
     if (!runCommand(message, validCommands)) {
       println(s"User ${message.user} inputted invalid request ${message.text}!")
-      slackState.imForUserId(message.user).map(im => {
+      slackState.imForUserId(message.user).foreach(im => {
         rtmClient.sendMessage(im.id, "Sorry - I didn't get that. Valid commands:")
         rtmClient.sendMessage(im.id, validCommands.map(c => s"*${c.command}* - ${c.tooltip}").mkString("\n"))
       })
@@ -111,11 +111,11 @@ object Main {
     rtmClient.onMessage { message =>
       println(s"user: ${message.user}, message: ${message.text}, channel: ${message.channel}")
 
-      if (rtmClient.state.ims.find( _.id == message.channel ).isDefined) {
+      if (rtmClient.state.ims.exists( _.id == message.channel )) {
         handleDM(message)
       }
     }
 
-    sys.addShutdownHook(state.save)
+    sys.addShutdownHook(state.save())
   }
 }
