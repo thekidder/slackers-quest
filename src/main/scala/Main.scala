@@ -109,10 +109,12 @@ object Main {
 
   def main(args: Array[String]) {
     rtmClient.onMessage { message =>
-      println(s"user: ${message.user}, message: ${message.text}, channel: ${message.channel}")
+      if (message.user != rtmClient.state.self.id) {
+        println(s"user: ${message.user}, message: ${message.text}, channel: ${message.channel}")
 
-      if (rtmClient.state.ims.exists( _.id == message.channel )) {
-        handleDM(message)
+        if (rtmClient.state.ims.exists(_.id == message.channel)) {
+          handleDM(message)
+        }
       }
     }
 
